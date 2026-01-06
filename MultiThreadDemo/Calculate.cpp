@@ -1,6 +1,8 @@
 #include "Calculate.h"
 #include <QThread>
 #include <QThreadPool>
+#include <QMutex>
+#include <QMutexLocker>
 
 #include "CalculateRunnable.h"
 
@@ -54,62 +56,54 @@ namespace ThreadDemo
 
 		auto test_thread_id = QThread::currentThreadId(); // 查看当前线程的id和界面类、任务类的id是否相同
 
+		// 4. 创建数据对象容器，用于收集多线程计算结果
+		std::vector<Takeoff> records;
+		QMutex recordsMutex; // 保护 records 的互斥锁
+
 		m_ThreadPool = new QThreadPool();
-		m_ThreadPool->setMaxThreadCount(aInput.threadMaxCount); // 设置线程池的最大线程数为1
+		m_ThreadPool->setMaxThreadCount(aInput.threadMaxCount); // 设置线程池的最大线程数
+
+		// 存储所有 runnable 指针，用于收集结果（不能设置 autoDelete）
+		std::vector<CalculateRunnable*> runnables;
+		runnables.reserve(aInput.calculateCount);
+
 		for (int i = 0; i < aInput.calculateCount; i++)
 		{
 			CalculateRunnable* runnable = new CalculateRunnable(aInput.calculateCount - i);
-			runnable->setAutoDelete(true); // 设置任务结束后自动删除
-			m_ThreadPool->start(runnable);
+			runnable->setAutoDelete(false); // 不自动删除，需要手动收集结果后删除
+			runnables.push_back(runnable);
 
-			//! 设置响应方式为消息队列时，会在emit CalculateFinished(); 后再响应，故这里使用直接响应
-			connect(runnable, &CalculateRunnable::runnableFinishedSignal, this, [&]() {
+			// 信号用于更新进度条
+			connect(runnable, &CalculateRunnable::runnableFinishedSignal, this, [this, runnable, &records, &recordsMutex]() {
 				emit updateProssorbarSignal();
 
-				Takeoff record;
-				record.height = 300.0;
-				record.weight = 20000.0;
-				record.windSpeed = 10.0;
-				record.temperature = 0.0;
-				record.runwayLength = 3000.0;
-
-				// 生成列表数据（10个时间点，0-9秒）
-				// 直接使用 QList<double>，ORM 会自动序列化
-				record.slipTimeList = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-				record.liftOffHeightList = { 0, 0, 0, 0, 0, 1, 2, 3, 5, 8 };
-				record.slipDistanceList = { 0, 12, 31, 46, 76, 99, 145, 234, 436, 674 };
-				record.airspeedList = { 0, 4, 5, 20, 34, 87, 129, 140, 189, 243 };
-
-				record.frontWheelLiftOffSpeed = 87.0;
-				record.rearWheelLiftOffSpeed = 243.0;
-
-				auto test_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
-				record.engineState = test_time.toStdString();
-
-// 				records.push_back(record);
-
-				if (!takeoffHandler || !takeoffHandler->insert(record)) {
-					qCritical() << "Failed to insert takeoff records";
-				}
-
+				// 收集计算结果到 records（线程安全）
+				QMutexLocker locker(&recordsMutex);
+				records.push_back(runnable->getResult());
 				}, 
 				Qt::DirectConnection
 			);
+
+			m_ThreadPool->start(runnable);
 		}
 		m_ThreadPool->waitForDone(); // 等待所有任务完成
+
+		// 5. 批量插入（使用 TableHandler）- 一次性插入所有结果
+		if (!takeoffHandler || !takeoffHandler->insertBatch(records)) {
+			qCritical() << "Failed to insert takeoff records";
+		}
+
+		// 手动删除所有 runnable
+		for (auto* runnable : runnables) {
+			delete runnable;
+		}
+		runnables.clear();
+
 		emit calculateFinishedSignal();
 
 		delete m_ThreadPool;
 		m_ThreadPool = nullptr;
 
-
-		// 5. 批量插入（使用 TableHandler）
-// 		TakeoffTableHandler* takeoffHandler = dbManager.getHandler<TakeoffTableHandler>();
-// 		if (!takeoffHandler || !takeoffHandler->insertBatch(records)) {
-// 			qCritical() << "Failed to insert takeoff records";
-// 			dbManager.close();
-// 		}
-// 
 		dbManager.close();
 
 	}
