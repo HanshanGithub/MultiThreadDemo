@@ -1,0 +1,35 @@
+# ===============================
+# EditorConfig for Cross-Platform C/C++ Project
+# ===============================
+
+root = true
+
+# -------------------------------
+# 全局默认设置（适合所有文本文件）
+# -------------------------------
+[*]
+charset = utf-8                # 跨平台首选，无 BOM
+end_of_line = lf               # 统一使用 LF（Linux / macOS / Git / CI 友好）
+insert_final_newline = true    # 文件末尾保留换行
+trim_trailing_whitespace = true
+
+# -------------------------------
+# C / C++ 文件
+# -------------------------------
+[*.{c,cpp,h,hpp}]
+indent_style = tab
+tab_width = 4
+
+# -------------------------------
+# CMake / Shell / 脚本文件
+# -------------------------------
+[*.{cmake,sh}]
+indent_style = space
+indent_size = 2
+
+# -------------------------------
+# Windows 批处理（必须 CRLF）
+# -------------------------------
+[*.bat]
+end_of_line = crlf
+charset = utf-8

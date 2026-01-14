@@ -9,10 +9,10 @@ namespace ThreadDemo
 {
 
 	/**
-	 * ¶àÏß³Ì¼ÆËãÀà
-	 * 1. ½âÎöÍâ²¿²ÎÊı£¬±éÀú¼ÆËãÇé¿ö
-	 * 2. ¸ºÔğ¸øÈÎÎñÀà´«µİÊäÈë²ÎÊı
-	 * 3. ¸üĞÂ½çÃæÏÔÊ¾½ø¶ÈÌõ
+	 * å¤šçº¿ç¨‹è®¡ç®—ç±»
+	 * 1. è§£æå¤–éƒ¨å‚æ•°ï¼Œéå†è®¡ç®—æƒ…å†µ
+	 * 2. è´Ÿè´£ç»™ä»»åŠ¡ç±»ä¼ é€’è¾“å…¥å‚æ•°
+	 * 3. æ›´æ–°ç•Œé¢æ˜¾ç¤ºè¿›åº¦æ¡
 	 */
 	class Calculate : public QObject
 	{
@@ -20,9 +20,9 @@ namespace ThreadDemo
 			using StringLists = QVector<QStringList>;
 	public:
 		Calculate(QObject* parent = nullptr);
-		
-		void directDoSomeThing(); //!< Ö±½Óµ÷ÓÃ»¹ÊÇÔÚÖ÷Ïß³ÌÖĞÖ´ĞĞ£¬Í¨¹ıĞÅºÅ²Ûµ÷ÓÃÔòÔÚ×ÓÏß³ÌÖĞÖ´ĞĞ
-		
+
+		void directDoSomeThing(); //!< ç›´æ¥è°ƒç”¨è¿˜æ˜¯åœ¨ä¸»çº¿ç¨‹ä¸­æ‰§è¡Œï¼Œé€šè¿‡ä¿¡å·æ§½è°ƒç”¨åˆ™åœ¨å­çº¿ç¨‹ä¸­æ‰§è¡Œ
+
 		~Calculate();
 
 	public slots:
@@ -34,7 +34,7 @@ namespace ThreadDemo
 		void updateProssorbarSignal();
 
 	private:
-		QThreadPool* m_ThreadPool; //!< ÓÃÓÚÔÚÖĞÉÏ¼ÆËãµÄÊ±ºòÊ¹ÓÃ
+		QThreadPool* m_ThreadPool; //!< ç”¨äºåœ¨ä¸­ä¸Šè®¡ç®—çš„æ—¶å€™ä½¿ç”¨
 	};
 
 }

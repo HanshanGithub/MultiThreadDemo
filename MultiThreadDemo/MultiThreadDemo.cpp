@@ -8,122 +8,122 @@
 #include "CalculateInputStruct.h"
 
 namespace ThreadDemo
-{    
+{
 
-    MultiThreadDemo::MultiThreadDemo(QWidget* parent)
-        : QMainWindow(parent)
-        , ui(new Ui::MultiThreadDemoClass())
-    {
-        m_CalculateStatus = false;
-        ui->setupUi(this);
+	MultiThreadDemo::MultiThreadDemo(QWidget* parent)
+		: QMainWindow(parent)
+		, ui(new Ui::MultiThreadDemoClass())
+	{
+		m_CalculateStatus = false;
+		ui->setupUi(this);
 
-        connect(ui->btn_calculate,        &QPushButton::clicked, this, &MultiThreadDemo::btn_calculate_slot);
-        connect(ui->btn_cancel_calculate, &QPushButton::clicked, this, &MultiThreadDemo::btn_cancel_calculate_slot);
+		connect(ui->btn_calculate, &QPushButton::clicked, this, &MultiThreadDemo::btn_calculate_slot);
+		connect(ui->btn_cancel_calculate, &QPushButton::clicked, this, &MultiThreadDemo::btn_cancel_calculate_slot);
 
 		m_Thread = new QThread();
 		m_Calculate = new Calculate();
-        m_Calculate->moveToThread(m_Thread); // ¸Ä±ämCalculateµÄÏß³ÌÒÀ¸½¹ØÏµ£¬½«¼ÆËãÀà·ÅÔÚÏß³ÌÖĞÖ´ĞĞ
+		m_Calculate->moveToThread(m_Thread); // æ”¹å˜mCalculateçš„çº¿ç¨‹ä¾é™„å…³ç³»ï¼Œå°†è®¡ç®—ç±»æ”¾åœ¨çº¿ç¨‹ä¸­æ‰§è¡Œ
 
-        //! ÊÍ·Å¶Ñ¿Õ¼ä×ÊÔ´£¬±ÜÃâÄÚ´æĞ¹Â¶
-        connect(m_Thread, &QThread::finished, m_Thread,    &QObject::deleteLater);
-        connect(m_Thread, &QThread::finished, m_Calculate, &QObject::deleteLater);
+		//! é‡Šæ”¾å †ç©ºé—´èµ„æºï¼Œé¿å…å†…å­˜æ³„éœ²
+		connect(m_Thread, &QThread::finished, m_Thread, &QObject::deleteLater);
+		connect(m_Thread, &QThread::finished, m_Calculate, &QObject::deleteLater);
 
-        //! ×¢Òâ£ºÔÚÊ¹ÓÃ¿çÏß³ÌÍ¨ĞÅÊ±£¬²ÎÊıĞèÒªÎªÔªÊı¾İÀàĞÍ
-        qRegisterMetaType<CalculateInputStruct>("CalculateInputStruct"); // ½«½á¹¹Ìå CalculateInputStruct ×¢²áÎªÔªÊı¾İÀàĞÍ
+		//! æ³¨æ„ï¼šåœ¨ä½¿ç”¨è·¨çº¿ç¨‹é€šä¿¡æ—¶ï¼Œå‚æ•°éœ€è¦ä¸ºå…ƒæ•°æ®ç±»å‹
+		qRegisterMetaType<CalculateInputStruct>("CalculateInputStruct"); // å°†ç»“æ„ä½“ CalculateInputStruct æ³¨å†Œä¸ºå…ƒæ•°æ®ç±»å‹
 
-        //! Á¬½ÓÆäËûĞÅºÅ²Û£¬ÓÃÓÚ´¥·¢Ïß³ÌÖ´ĞĞ²Ûº¯ÊıÀïµÄÈÎÎñ    
-        connect(this, &MultiThreadDemo::startCalculateSignal,  m_Calculate, &Calculate::startCalculate,  Qt::QueuedConnection); // Ä¬ÈÏÊ¹ÓÃQt::QueuedConnection£¬±£Ö¤²Ûº¯ÊıµÄÖ´ĞĞË³Ğò
-        connect(this, &MultiThreadDemo::cancleCalculateSignal, m_Calculate, &Calculate::cancelCalculate, Qt::DirectConnection);
+		//! è¿æ¥å…¶ä»–ä¿¡å·æ§½ï¼Œç”¨äºè§¦å‘çº¿ç¨‹æ‰§è¡Œæ§½å‡½æ•°é‡Œçš„ä»»åŠ¡    
+		connect(this, &MultiThreadDemo::startCalculateSignal, m_Calculate, &Calculate::startCalculate, Qt::QueuedConnection); // é»˜è®¤ä½¿ç”¨Qt::QueuedConnectionï¼Œä¿è¯æ§½å‡½æ•°çš„æ‰§è¡Œé¡ºåº
+		connect(this, &MultiThreadDemo::cancleCalculateSignal, m_Calculate, &Calculate::cancelCalculate, Qt::DirectConnection);
 
-        connect(m_Calculate, &Calculate::calculateFinishedSignal, this, &MultiThreadDemo::calculate_finished_slot, Qt::QueuedConnection); // ¼ÆËãÍê³ÉÏÔÊ¾ĞÅÏ¢
-        connect(m_Calculate, &Calculate::updateProssorbarSignal,  this, &MultiThreadDemo::update_prossorbar_slot,  Qt::QueuedConnection); // Ã¿¼ÆËãÒ»´ÎÍêÒ»´ÎÈÎÎñ£¬¸üĞÂ½çÃæ½ø¶ÈÌõ
+		connect(m_Calculate, &Calculate::calculateFinishedSignal, this, &MultiThreadDemo::calculate_finished_slot, Qt::QueuedConnection); // è®¡ç®—å®Œæˆæ˜¾ç¤ºä¿¡æ¯
+		connect(m_Calculate, &Calculate::updateProssorbarSignal, this, &MultiThreadDemo::update_prossorbar_slot, Qt::QueuedConnection); // æ¯è®¡ç®—ä¸€æ¬¡å®Œä¸€æ¬¡ä»»åŠ¡ï¼Œæ›´æ–°ç•Œé¢è¿›åº¦æ¡
 
-        m_Thread->start(); // Æô¶¯Ïß³Ì£¬Ïß³ÌÄ¬ÈÏ¿ªÆôÊÂ¼şÑ­»·£¬²¢ÇÒÏß³ÌÕı´¦ÓÚÊÂ¼şÑ­»·×´Ì¬
+		m_Thread->start(); // å¯åŠ¨çº¿ç¨‹ï¼Œçº¿ç¨‹é»˜è®¤å¼€å¯äº‹ä»¶å¾ªç¯ï¼Œå¹¶ä¸”çº¿ç¨‹æ­£å¤„äºäº‹ä»¶å¾ªç¯çŠ¶æ€
 
-        QRegExp regex("^[0-9.,:- ]*$");
-        QRegExpValidator* validator = new QRegExpValidator(regex);
-        ui->line_edit_calculate_count->setValidator(validator);
-    }
+		QRegExp regex("^[0-9.,:- ]*$");
+		QRegExpValidator* validator = new QRegExpValidator(regex);
+		ui->line_edit_calculate_count->setValidator(validator);
+	}
 
-    MultiThreadDemo::~MultiThreadDemo()
-    {
-        delete ui;
-    }
+	MultiThreadDemo::~MultiThreadDemo()
+	{
+		delete ui;
+	}
 
-    void MultiThreadDemo::btn_calculate_slot()
-    {
-        auto test_thread_id = QThread::currentThreadId(); // ²é¿´µ±Ç°Ïß³ÌµÄidºÍ¼ÆËãÀàµÄidÊÇ·ñÏàÍ¬
+	void MultiThreadDemo::btn_calculate_slot()
+	{
+		auto test_thread_id = QThread::currentThreadId(); // æŸ¥çœ‹å½“å‰çº¿ç¨‹çš„idå’Œè®¡ç®—ç±»çš„idæ˜¯å¦ç›¸åŒ
 
-        //! ¼ì²éÊäÈë
-        auto max_count_str = ui->line_edit_thread_max_count->text();
-        if (max_count_str == "" || max_count_str.toInt() <= 0) 
-        {
-            ui->calculate_message->append(u8"¼ÆËã×î´óÏß³ÌÊıÁ¿ĞèÒª´óÓÚ0£¡"); 
-            return;
-        }
+		//! æ£€æŸ¥è¾“å…¥
+		auto max_count_str = ui->line_edit_thread_max_count->text();
+		if (max_count_str == "" || max_count_str.toInt() <= 0)
+		{
+			ui->calculate_message->append("è®¡ç®—æœ€å¤§çº¿ç¨‹æ•°é‡éœ€è¦å¤§äº0ï¼");
+			return;
+		}
 
-        auto calculate_count_str = ui->line_edit_calculate_count->text();
-        if (calculate_count_str == "" || calculate_count_str.toInt() <= 0) 
-        {
-            ui->calculate_message->append(u8"¼ÆËã´ÎÊıĞèÒª´óÓÚ0£¡"); 
-            return;
-        }
+		auto calculate_count_str = ui->line_edit_calculate_count->text();
+		if (calculate_count_str == "" || calculate_count_str.toInt() <= 0)
+		{
+			ui->calculate_message->append(u8"è®¡ç®—æ¬¡æ•°éœ€è¦å¤§äº0ï¼");
+			return;
+		}
 
-        //! ÅĞ¶ÏÊÇ·ñÔÚ¼ÆËã
-        if (m_CalculateStatus)
-        {
-            ui->calculate_message->append(u8"ÕıÔÚ¼ÆËã£¬ÇëÉÔºó...");
-            return;
-        }
-        m_CalculateStatus = true;
+		//! åˆ¤æ–­æ˜¯å¦åœ¨è®¡ç®—
+		if (m_CalculateStatus)
+		{
+			ui->calculate_message->append(u8"æ­£åœ¨è®¡ç®—ï¼Œè¯·ç¨å...");
+			return;
+		}
+		m_CalculateStatus = true;
 
-        //! Ìí¼Ó¼ÆËãĞÅÏ¢
-        QString start_msg =
-            QString(u8"±¾´Î¼ÆËã´ÎÊı %1£¬µ¥Ïß³ÌĞèÒªÊ±¼äÎª %3s£¬µ±Ç°¼ÆËãÏß³ÌÊıÁ¿ %2\n")
-            .arg(ui->line_edit_calculate_count->text())
-            .arg(ui->line_edit_thread_max_count->text())
-            .arg(ui->line_edit_calculate_count->text().toInt() * 0.5);
-        start_msg += u8"¿ªÊ¼¼ÆËã£¬µ±Ç°Ê±¼ä£º" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
-        ui->calculate_message->append(start_msg);
+		//! æ·»åŠ è®¡ç®—ä¿¡æ¯
+		QString start_msg =
+			QString(u8"æœ¬æ¬¡è®¡ç®—æ¬¡æ•° %1ï¼Œå•çº¿ç¨‹éœ€è¦æ—¶é—´ä¸º %3sï¼Œå½“å‰è®¡ç®—çº¿ç¨‹æ•°é‡ %2\n")
+			.arg(ui->line_edit_calculate_count->text())
+			.arg(ui->line_edit_thread_max_count->text())
+			.arg(ui->line_edit_calculate_count->text().toInt() * 0.5);
+		start_msg += u8"å¼€å§‹è®¡ç®—ï¼Œå½“å‰æ—¶é—´ï¼š" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
+		ui->calculate_message->append(start_msg);
 
-        //! Éè¶¨ÊäÈë²ÎÊı
-        CalculateInputStruct input;
-        input.msg = "start";
-        input.threadMaxCount = max_count_str.toInt();
-        input.calculateCount = calculate_count_str.toInt();
+		//! è®¾å®šè¾“å…¥å‚æ•°
+		CalculateInputStruct input;
+		input.msg = "start";
+		input.threadMaxCount = max_count_str.toInt();
+		input.calculateCount = calculate_count_str.toInt();
 
-        ui->calculate_prossorbar->reset();
-        ui->calculate_prossorbar->setRange(0, input.calculateCount);
-        ui->calculate_prossorbar->setValue(0);
+		ui->calculate_prossorbar->reset();
+		ui->calculate_prossorbar->setRange(0, input.calculateCount);
+		ui->calculate_prossorbar->setValue(0);
 
-        emit startCalculateSignal(input);
-        m_StartTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zz");
-    }
+		emit startCalculateSignal(input);
+		m_StartTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zz");
+	}
 
-    void MultiThreadDemo::btn_cancel_calculate_slot()
-    {
-        emit cancleCalculateSignal();
-    }
+	void MultiThreadDemo::btn_cancel_calculate_slot()
+	{
+		emit cancleCalculateSignal();
+	}
 
 	void MultiThreadDemo::calculate_finished_slot()
-    {
-        m_CalculateStatus = false;
-        QString finished_msg = u8"¼ÆËãÍê³É£¬µ±Ç°Ê±¼ä£º" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
-        ui->calculate_message->append(finished_msg);
-        ui->calculate_message->append(u8"=========================");
-        ui->calculate_message->append("");
-        ui->calculate_message->append("");
+	{
+		m_CalculateStatus = false;
+		QString finished_msg = u8"è®¡ç®—å®Œæˆï¼Œå½“å‰æ—¶é—´ï¼š" + QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
+		ui->calculate_message->append(finished_msg);
+		ui->calculate_message->append(u8"=========================");
+		ui->calculate_message->append("");
+		ui->calculate_message->append("");
 
-        int i = 1;
-    }
+		int i = 1;
+	}
 
-    void MultiThreadDemo::update_prossorbar_slot()
-    {
-        auto cur_num = ui->calculate_prossorbar->value();
-        if (cur_num < ui->calculate_prossorbar->maximum())
-        {
-            ui->calculate_prossorbar->setValue(cur_num + 1);
-        }
-    }
+	void MultiThreadDemo::update_prossorbar_slot()
+	{
+		auto cur_num = ui->calculate_prossorbar->value();
+		if (cur_num < ui->calculate_prossorbar->maximum())
+		{
+			ui->calculate_prossorbar->setValue(cur_num + 1);
+		}
+	}
 
 }

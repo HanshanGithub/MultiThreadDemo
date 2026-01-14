@@ -7,16 +7,16 @@ namespace ThreadDemo
 {
 
 	/*
-	 *	QRunnable继承QObject可实现信号槽
+	 *	QRunnable缁ф壙QObject鍙疄鐜颁俊鍙锋Ы
 	 */
 	class CalculateRunnable : public QObject, public QRunnable
 	{
 		Q_OBJECT
 	public:
-		explicit CalculateRunnable(const int aVectorSize, QObject *parent = nullptr);
+		explicit CalculateRunnable(const int aVectorSize, QObject* parent = nullptr);
 		~CalculateRunnable();
 
-		// 获取计算结果
+		// 鑾峰彇璁＄畻缁撴灉
 		Takeoff getResult() const { return m_Result; }
 
 	signals:

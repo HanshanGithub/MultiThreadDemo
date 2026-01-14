@@ -1,13 +1,13 @@
 #pragma once
 
-#include <string>
+#include "table_handler.h"
+#include <QString>
+#include <QDebug>
 #include <vector>
 #include <memory>
 #include <functional>
 #include <unordered_map>
 #include <typeindex>
-#include <iostream>
-#include "table_handler.h"
 
 // 前向声明
 struct sqlite3;
@@ -47,7 +47,7 @@ public:
 		if (m_typeIndexMap.find(typeIdx) == m_typeIndexMap.end()) {
 			m_typeIndexMap[typeIdx] = m_factories.size();
 			m_factories.push_back({factory, typeIdx});
-			std::cout << "[DEBUG] Registered table handler: " << typeid(HandlerType).name() << std::endl;
+			qDebug() << "Registered table handler:" << typeid(HandlerType).name();
 		}
 	}
 
@@ -104,3 +104,5 @@ public:
  */
 #define REGISTER_TABLE_HANDLER(HandlerType) \
 	static TableHandlerRegistrar<HandlerType> g_##HandlerType##_registrar;
+
+

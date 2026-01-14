@@ -3,6 +3,7 @@
 #include <QThreadPool>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QDebug>
 
 #include "CalculateRunnable.h"
 
@@ -22,8 +23,8 @@ namespace ThreadDemo
 
 	void Calculate::directDoSomeThing()
 	{
-		//!@ ²âÊÔÍâ²¿µ÷ÓÃ½Ó¿ÚÓë²Ûº¯ÊıÏìÓ¦ÊÇ·ñÔÚÍ¬Ò»Ïß³ÌÖĞ
-		auto test_thread_id = QThread::currentThreadId(); 
+		//!@ æµ‹è¯•å¤–éƒ¨è°ƒç”¨æ¥å£ä¸æ§½å‡½æ•°å“åº”æ˜¯å¦åœ¨åŒä¸€çº¿ç¨‹ä¸­
+		auto test_thread_id = QThread::currentThreadId();
 		int i = 1;
 	}
 
@@ -34,66 +35,66 @@ namespace ThreadDemo
 
 	void Calculate::startCalculate(const CalculateInputStruct aInput)
 	{
-		QString dbPath = QDir::current().absoluteFilePath("wlx.db");
+		QString dbPath = QDir::current().absoluteFilePath("wlx-sql-cpp.db");
 
-		// 1. ´´½¨Êı¾İ¿â¹ÜÀíÆ÷£¨ORM ·â×°£©
+		// 1. åˆ›å»ºæ•°æ®åº“ç®¡ç†å™¨ï¼ˆORM å°è£…ï¼‰
 		DatabaseManager dbManager;
 
-		// 2. ´ò¿ªÊı¾İ¿â²¢ÉèÖÃ SQLCipher ÃÜÔ¿
-		if (!dbManager.open(dbPath, "123456")) {
+		// 2. æ‰“å¼€æ•°æ®åº“å¹¶è®¾ç½® SQLCipher å¯†é’¥
+		if (!dbManager.open(dbPath.toStdString(), "123456")) {
 			qCritical() << "Failed to open database";
 		}
 
-		// 3. Í¬²½Êı¾İ¿â¼Ü¹¹£¨´´½¨±í£©
+		// 3. åŒæ­¥æ•°æ®åº“æ¶æ„ï¼ˆåˆ›å»ºè¡¨ï¼‰
 		if (!dbManager.syncSchema()) {
 			qCritical() << "Failed to sync schema";
 			dbManager.close();
 		}
 		TakeoffTableHandler* takeoffHandler = dbManager.getHandler<TakeoffTableHandler>();
 
-// 		// 4. ´´½¨Êı¾İ¶ÔÏó£¨ORM ÊµÌå£©- »ùÓÚÊµ¼ÊÊı¾İÊ¾Àı
-// 		std::vector<Takeoff> records;
+		// 		// 4. åˆ›å»ºæ•°æ®å¯¹è±¡ï¼ˆORM å®ä½“ï¼‰- åŸºäºå®é™…æ•°æ®ç¤ºä¾‹
+		// 		std::vector<Takeoff> records;
 
-		auto test_thread_id = QThread::currentThreadId(); // ²é¿´µ±Ç°Ïß³ÌµÄidºÍ½çÃæÀà¡¢ÈÎÎñÀàµÄidÊÇ·ñÏàÍ¬
+		auto test_thread_id = QThread::currentThreadId(); // æŸ¥çœ‹å½“å‰çº¿ç¨‹çš„idå’Œç•Œé¢ç±»ã€ä»»åŠ¡ç±»çš„idæ˜¯å¦ç›¸åŒ
 
-		// 4. ´´½¨Êı¾İ¶ÔÏóÈİÆ÷£¬ÓÃÓÚÊÕ¼¯¶àÏß³Ì¼ÆËã½á¹û
+		// 4. åˆ›å»ºæ•°æ®å¯¹è±¡å®¹å™¨ï¼Œç”¨äºæ”¶é›†å¤šçº¿ç¨‹è®¡ç®—ç»“æœ
 		std::vector<Takeoff> records;
-		QMutex recordsMutex; // ±£»¤ records µÄ»¥³âËø
+		QMutex recordsMutex; // ä¿æŠ¤ records çš„äº’æ–¥é”
 
 		m_ThreadPool = new QThreadPool();
-		m_ThreadPool->setMaxThreadCount(aInput.threadMaxCount); // ÉèÖÃÏß³Ì³ØµÄ×î´óÏß³ÌÊı
+		m_ThreadPool->setMaxThreadCount(aInput.threadMaxCount); // è®¾ç½®çº¿ç¨‹æ± çš„æœ€å¤§çº¿ç¨‹æ•°
 
-		// ´æ´¢ËùÓĞ runnable Ö¸Õë£¬ÓÃÓÚÊÕ¼¯½á¹û£¨²»ÄÜÉèÖÃ autoDelete£©
+		// å­˜å‚¨æ‰€æœ‰ runnable æŒ‡é’ˆï¼Œç”¨äºæ”¶é›†ç»“æœï¼ˆä¸èƒ½è®¾ç½® autoDeleteï¼‰
 		std::vector<CalculateRunnable*> runnables;
 		runnables.reserve(aInput.calculateCount);
 
 		for (int i = 0; i < aInput.calculateCount; i++)
 		{
 			CalculateRunnable* runnable = new CalculateRunnable(aInput.calculateCount - i);
-			runnable->setAutoDelete(false); // ²»×Ô¶¯É¾³ı£¬ĞèÒªÊÖ¶¯ÊÕ¼¯½á¹ûºóÉ¾³ı
+			runnable->setAutoDelete(false); // ä¸è‡ªåŠ¨åˆ é™¤ï¼Œéœ€è¦æ‰‹åŠ¨æ”¶é›†ç»“æœååˆ é™¤
 			runnables.push_back(runnable);
 
-			// ĞÅºÅÓÃÓÚ¸üĞÂ½ø¶ÈÌõ
+			// ä¿¡å·ç”¨äºæ›´æ–°è¿›åº¦æ¡
 			connect(runnable, &CalculateRunnable::runnableFinishedSignal, this, [this, runnable, &records, &recordsMutex]() {
 				emit updateProssorbarSignal();
 
-				// ÊÕ¼¯¼ÆËã½á¹ûµ½ records£¨Ïß³Ì°²È«£©
+				// æ”¶é›†è®¡ç®—ç»“æœåˆ° recordsï¼ˆçº¿ç¨‹å®‰å…¨ï¼‰
 				QMutexLocker locker(&recordsMutex);
 				records.push_back(runnable->getResult());
-				}, 
+				},
 				Qt::DirectConnection
 			);
 
 			m_ThreadPool->start(runnable);
 		}
-		m_ThreadPool->waitForDone(); // µÈ´ıËùÓĞÈÎÎñÍê³É
+		m_ThreadPool->waitForDone(); // ç­‰å¾…æ‰€æœ‰ä»»åŠ¡å®Œæˆ
 
-		// 5. ÅúÁ¿²åÈë£¨Ê¹ÓÃ TableHandler£©- Ò»´ÎĞÔ²åÈëËùÓĞ½á¹û
+		// 5. æ‰¹é‡æ’å…¥ï¼ˆä½¿ç”¨ TableHandlerï¼‰- ä¸€æ¬¡æ€§æ’å…¥æ‰€æœ‰ç»“æœ
 		if (!takeoffHandler || !takeoffHandler->insertBatch(records)) {
 			qCritical() << "Failed to insert takeoff records";
 		}
 
-		// ÊÖ¶¯É¾³ıËùÓĞ runnable
+		// æ‰‹åŠ¨åˆ é™¤æ‰€æœ‰ runnable
 		for (auto* runnable : runnables) {
 			delete runnable;
 		}
@@ -112,9 +113,9 @@ namespace ThreadDemo
 	{
 		if (m_ThreadPool)
 		{
-			m_ThreadPool->clear(); // Çå¿ÕÏß³Ì³Ø
-// 		delete mThreadPool;
-// 		mThreadPool = nullptr;
+			m_ThreadPool->clear(); // æ¸…ç©ºçº¿ç¨‹æ± 
+			// 		delete mThreadPool;
+			// 		mThreadPool = nullptr;
 		}
 	}
 }

@@ -2,12 +2,12 @@
 
 #include "table_handler.h"
 #include "table_handler_registry.h"
-#include <string>
+#include <QString>
+#include <QDebug>
 #include <memory>
 #include <vector>
 #include <unordered_map>
 #include <typeindex>
-#include <iostream>
 
 // 前向声明
 struct sqlite3;
@@ -35,7 +35,7 @@ public:
 	~DatabaseManager();
 
 	// 打开数据库连接（带 SQLCipher 密钥）
-	bool open(const std::string& dbPath, const std::string& key = "123456");
+	bool open(const QString& dbPath, const QString& key = "123456");
 
 	// 关闭数据库连接
 	void close();
@@ -47,7 +47,7 @@ public:
 	template<typename HandlerType>
 	HandlerType* getHandler() {
 		if (!m_isOpen || !m_db) {
-			std::cerr << "[ERROR] Database not opened" << std::endl;
+			qCritical() << "Database not opened";
 			return nullptr;
 		}
 
@@ -67,7 +67,7 @@ public:
 			}
 		}
 
-		std::cerr << "[WARNING] Handler not found for type: " << typeid(HandlerType).name() << std::endl;
+		qWarning() << "Handler not found for type:" << typeid(HandlerType).name();
 		return nullptr;
 	}
 
@@ -82,7 +82,7 @@ public:
 
 private:
 	sqlite3* m_db = nullptr;
-	std::string m_dbPath;
+	QString m_dbPath;
 	bool m_isOpen = false;
 
 	// 所有 handler 的统一存储
@@ -94,3 +94,4 @@ private:
 	// 初始化所有已注册的 handler
 	void initTableHandlers();
 };
+

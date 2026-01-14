@@ -1,9 +1,9 @@
 #pragma once
 
+#include <QString>
+#include <QByteArray>
+#include <QList>
 #include <string>
-#include <vector>
-#include <sstream>
-#include <iomanip>
 #include "field_metadata.h"
 
 extern "C" {
@@ -50,7 +50,8 @@ using std_string = std::string;
 
 #define ORM_BIND_std_string(stmt, idx, val) \
 	do { \
-		sqlite3_bind_text(stmt, idx, val.c_str(), static_cast<int>(val.size()), SQLITE_TRANSIENT); \
+		QByteArray _bytes = QString::fromStdString(val).toUtf8(); \
+		sqlite3_bind_text(stmt, idx, _bytes.constData(), _bytes.size(), SQLITE_TRANSIENT); \
 	} while(0)
 
 #define ORM_BIND_FIELD(type, name, sqlType, defaultVal, notNull) \
@@ -61,8 +62,9 @@ using std_string = std::string;
 
 #define ORM_BIND_LIST_FIELD(type, name, sqlType, defaultVal, notNull) \
 	if (fieldName == #name) { \
-		std::string _str = serializeList(record.name); \
-		sqlite3_bind_text(stmt, index, _str.empty() ? nullptr : _str.c_str(), static_cast<int>(_str.size()), SQLITE_TRANSIENT); \
+		QString _str = serializeList(record.name); \
+		QByteArray _bytes = _str.toUtf8(); \
+		sqlite3_bind_text(stmt, index, _bytes.isEmpty() ? nullptr : _bytes.constData(), _bytes.size(), SQLITE_TRANSIENT); \
 		return; \
 	}
 
@@ -90,7 +92,7 @@ using std_string = std::string;
 	if (fieldName == #name) { \
 		const unsigned char* _text = sqlite3_column_text(stmt, index); \
 		if (_text) { \
-			record.name = deserializeList(std::string(reinterpret_cast<const char*>(_text))); \
+			record.name = deserializeList(QString::fromUtf8(reinterpret_cast<const char*>(_text))); \
 		} \
 		return; \
 	}
@@ -99,10 +101,10 @@ using std_string = std::string;
 
 #define ORM_FIELD_ACCESSOR(RecordType, FIELDS) \
 	struct FieldAccessor { \
-		static void bindField(sqlite3_stmt* stmt, int index, const RecordType& record, const std::string& fieldName) { \
+		static void bindField(sqlite3_stmt* stmt, int index, const RecordType& record, const QString& fieldName) { \
 			FIELDS(ORM_BIND_FIELD, ORM_BIND_LIST_FIELD) \
 		} \
-		static void readField(sqlite3_stmt* stmt, int index, RecordType& record, const std::string& fieldName) { \
+		static void readField(sqlite3_stmt* stmt, int index, RecordType& record, const QString& fieldName) { \
 			if (fieldName == "id") { record.id = sqlite3_column_int(stmt, index); return; } \
 			FIELDS(ORM_READ_FIELD, ORM_READ_LIST_FIELD) \
 		} \
@@ -111,40 +113,31 @@ using std_string = std::string;
 // ============== 辅助方法宏 ==============
 
 #define ORM_LIST_HELPERS() \
-	static std::string serializeList(const std::vector<double>& list) { \
-		if (list.empty()) return ""; \
-		std::ostringstream oss; \
-		oss << "["; \
-		for (size_t i = 0; i < list.size(); ++i) { \
-			if (i > 0) oss << ","; \
-			oss << std::fixed << std::setprecision(15) << list[i]; \
+	static QString serializeList(const QList<double>& list) { \
+		if (list.isEmpty()) return ""; \
+		QStringList parts; \
+		for (double value : list) { \
+			parts << QString::number(value, 'g', 15); \
 		} \
-		oss << "]"; \
-		return oss.str(); \
+		return QString("[%1]").arg(parts.join(",")); \
 	} \
-	static std::vector<double> deserializeList(const std::string& str) { \
-		std::vector<double> result; \
-		if (str.empty()) return result; \
-		std::string trimmed = str; \
-		trimmed.erase(0, trimmed.find_first_not_of(" \t\n\r")); \
-		trimmed.erase(trimmed.find_last_not_of(" \t\n\r") + 1); \
-		if (trimmed.empty()) return result; \
-		if (trimmed.front() == '[' && trimmed.back() == ']') { \
-			trimmed = trimmed.substr(1, trimmed.length() - 2); \
+	static QList<double> deserializeList(const QString& str) { \
+		QList<double> result; \
+		if (str.isEmpty()) return result; \
+		QString trimmed = str.trimmed(); \
+		if (trimmed.startsWith('[') && trimmed.endsWith(']')) { \
+			trimmed = trimmed.mid(1, trimmed.length() - 2); \
 		} \
-		if (trimmed.empty()) return result; \
-		std::istringstream iss(trimmed); \
-		std::string token; \
-		while (std::getline(iss, token, ',')) { \
-			token.erase(0, token.find_first_not_of(" \t\n\r")); \
-			token.erase(token.find_last_not_of(" \t\n\r") + 1); \
-			if (!token.empty()) { \
-				try { \
-					double value = std::stod(token); \
-					result.push_back(value); \
-				} catch (...) { \
-				} \
+		if (trimmed.isEmpty()) return result; \
+		QStringList parts = trimmed.split(',', Qt::SkipEmptyParts); \
+		for (const QString& part : parts) { \
+			QString trimmedPart = part.trimmed(); \
+			if (!trimmedPart.isEmpty()) { \
+				bool ok = false; \
+				double value = trimmedPart.toDouble(&ok); \
+				if (ok) result.append(value); \
 			} \
 		} \
 		return result; \
 	}
+

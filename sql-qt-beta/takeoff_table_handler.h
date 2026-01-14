@@ -3,20 +3,18 @@
 #include "table_handler.h"
 #include "takeoff.h"
 #include "sql_generator.h"
-
-// 前向声明
-struct sqlite3;
+#include <QByteArray>
 
 // Takeoff 表的处理器
 class TakeoffTableHandler : public TableHandler<Takeoff> {
 public:
 	TakeoffTableHandler(sqlite3* db) : TableHandler<Takeoff>(db) {}
 
-	std::string getTableName() const override {
+	QString getTableName() const override {
 		return Takeoff::getTableName();
 	}
 
-	std::string getCreateTableSQL() const override {
+	QString getCreateTableSQL() const override {
 		// 自动从结构体定义生成 CREATE TABLE SQL
 		return SQLGenerator::generateCreateTableSQL(
 			Takeoff::getTableName(),
@@ -30,3 +28,4 @@ public:
 	bool update(const Takeoff& record) override;
 	bool remove(int id) override;
 };
+

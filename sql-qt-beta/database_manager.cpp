@@ -1,6 +1,7 @@
 #include "database_manager.h"
-#include <iostream>
-#include <cstring>
+#include <QDebug>
+#include <QDir>
+#include <QByteArray>
 
 extern "C" {
 #include "sqlite3.h"
@@ -17,31 +18,32 @@ void DatabaseManager::initTableHandlers() {
 	if (m_db && m_handlers.empty()) {
 		// 从注册表自动创建所有已注册的 handler
 		m_handlers = TableHandlerRegistry::instance().createAllHandlers(m_db);
-		std::cout << "[DEBUG] Initialized " << m_handlers.size() << " table handlers from registry" << std::endl;
+		qDebug() << "Initialized" << m_handlers.size() << "table handlers from registry";
 	}
 }
 
-bool DatabaseManager::open(const std::string& dbPath, const std::string& key) {
+bool DatabaseManager::open(const QString& dbPath, const QString& key) {
 	if (m_isOpen) {
-		std::cerr << "[WARNING] Database already opened" << std::endl;
+		qWarning() << "Database already opened";
 		return true;
 	}
 
 	m_dbPath = dbPath;
 
 	// 使用原生 SQLite C API 打开数据库
-	int rc = sqlite3_open(dbPath.c_str(), &m_db);
+	int rc = sqlite3_open(dbPath.toUtf8().constData(), &m_db);
 	if (rc != SQLITE_OK) {
-		std::cerr << "[ERROR] Failed to open database: " << sqlite3_errmsg(m_db) << std::endl;
+		qCritical() << "Failed to open database:" << sqlite3_errmsg(m_db);
 		sqlite3_close(m_db);
 		m_db = nullptr;
 		return false;
 	}
 
 	// 设置 SQLCipher 密钥
-	rc = sqlite3_key(m_db, key.c_str(), static_cast<int>(key.size()));
+	QByteArray keyBytes = key.toUtf8();
+	rc = sqlite3_key(m_db, keyBytes.constData(), keyBytes.size());
 	if (rc != SQLITE_OK) {
-		std::cerr << "[ERROR] Failed to set SQLCipher key: " << sqlite3_errmsg(m_db) << std::endl;
+		qCritical() << "Failed to set SQLCipher key:" << sqlite3_errmsg(m_db);
 		sqlite3_close(m_db);
 		m_db = nullptr;
 		return false;
@@ -51,7 +53,7 @@ bool DatabaseManager::open(const std::string& dbPath, const std::string& key) {
 	sqlite3_stmt* stmt = nullptr;
 	rc = sqlite3_prepare_v2(m_db, "SELECT COUNT(*) FROM sqlite_master", -1, &stmt, nullptr);
 	if (rc != SQLITE_OK) {
-		std::cerr << "[ERROR] Invalid SQLCipher key or database corrupted: " << sqlite3_errmsg(m_db) << std::endl;
+		qCritical() << "Invalid SQLCipher key or database corrupted:" << sqlite3_errmsg(m_db);
 		sqlite3_close(m_db);
 		m_db = nullptr;
 		return false;
@@ -60,7 +62,7 @@ bool DatabaseManager::open(const std::string& dbPath, const std::string& key) {
 
 	m_isOpen = true;
 	initTableHandlers();
-	std::cout << "[DEBUG] Database opened successfully: " << dbPath << std::endl;
+	qDebug() << "Database opened successfully:" << dbPath;
 	return true;
 }
 
@@ -73,13 +75,13 @@ void DatabaseManager::close() {
 		sqlite3_close(m_db);
 		m_db = nullptr;
 		m_isOpen = false;
-		std::cout << "[DEBUG] Database closed" << std::endl;
+		qDebug() << "Database closed";
 	}
 }
 
 bool DatabaseManager::syncSchema() {
 	if (!m_isOpen || !m_db) {
-		std::cerr << "[ERROR] Database not opened" << std::endl;
+		qCritical() << "Database not opened";
 		return false;
 	}
 
@@ -88,12 +90,13 @@ bool DatabaseManager::syncSchema() {
 	// 自动遍历所有已注册的 handler 创建表
 	for (const auto& handler : m_handlers) {
 		if (!handler->createTable(m_db)) {
-			std::cerr << "[ERROR] Failed to create table: " << handler->getTableName() << std::endl;
+			qCritical() << "Failed to create table:" << handler->getTableName();
 			return false;
 		}
-		std::cout << "[DEBUG] Created table: " << handler->getTableName() << std::endl;
+		qDebug() << "Created table:" << handler->getTableName();
 	}
 
-	std::cout << "[DEBUG] Schema synced successfully, total tables: " << m_handlers.size() << std::endl;
+	qDebug() << "Schema synced successfully, total tables:" << m_handlers.size();
 	return true;
 }
+

@@ -22,8 +22,8 @@ namespace ThreadDemo
 		~MultiThreadDemo();
 
 	signals:
-		void startCalculateSignal(const CalculateInputStruct aInput);      //!< ÈÃ¼ÆËãÀà¿ªÊ¼¼ÆËã
-		void cancleCalculateSignal();                                      //!< È¡Ïû¼ÆËã
+		void startCalculateSignal(const CalculateInputStruct aInput);      //!< è®©è®¡ç®—ç±»å¼€å§‹è®¡ç®—
+		void cancleCalculateSignal();                                      //!< å–æ¶ˆè®¡ç®—
 
 	private slots:
 		void btn_calculate_slot();
@@ -35,9 +35,9 @@ namespace ThreadDemo
 	private:
 		Ui::MultiThreadDemoClass* ui;
 
-		QThread*   m_Thread;          //!< ¼ÆËãÀàÖ´ÐÐµÄÏß³Ì
-		Calculate* m_Calculate;       //!< ¼ÆËãÀà£¬·ÅÔÚmThreadÏß³ÌÀïÃæÖ´ÐÐ£¬±ÜÃâ½çÃæ¿¨ËÀ
-		QString    m_StartTime;       //!< ¼ÇÂ¼¿ªÊ¼¼ÆËãÊ±¼ä
-		bool       m_CalculateStatus; //!< ¼ÆËã×´Ì¬
+		QThread* m_Thread;          //!< è®¡ç®—ç±»æ‰§è¡Œçš„çº¿ç¨‹
+		Calculate* m_Calculate;       //!< è®¡ç®—ç±»ï¼Œæ”¾åœ¨mThreadçº¿ç¨‹é‡Œé¢æ‰§è¡Œï¼Œé¿å…ç•Œé¢å¡æ­»
+		QString    m_StartTime;       //!< è®°å½•å¼€å§‹è®¡ç®—æ—¶é—´
+		bool       m_CalculateStatus; //!< è®¡ç®—çŠ¶æ€
 	};
 }

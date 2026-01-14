@@ -17,10 +17,10 @@
 	X(double, windSpeed, "REAL", "(0)", true) \
 	X(double, temperature, "REAL", "(15)", true) \
 	X(double, runwayLength, "REAL", "(3000)", true) \
-	LIST(std::vector<double>, slipTimeList, "TEXT", "", false) \
-	LIST(std::vector<double>, liftOffHeightList, "TEXT", "", false) \
-	LIST(std::vector<double>, slipDistanceList, "TEXT", "", false) \
-	LIST(std::vector<double>, airspeedList, "TEXT", "", false) \
+	LIST(QList<double>, slipTimeList, "TEXT", "", false) \
+	LIST(QList<double>, liftOffHeightList, "TEXT", "", false) \
+	LIST(QList<double>, slipDistanceList, "TEXT", "", false) \
+	LIST(QList<double>, airspeedList, "TEXT", "", false) \
 	X(double, frontWheelLiftOffSpeed, "REAL", "(0)", true) \
 	X(double, rearWheelLiftOffSpeed, "REAL", "(0)", true) \
 	X(std_string, engineState, "TEXT", "''", true)
@@ -34,10 +34,11 @@ struct Takeoff {
 	ORM_DECLARE_FIELDS(TAKEOFF_FIELDS)
 	ORM_LIST_HELPERS()
 	
-	static std::string getTableName() {
+	static QString getTableName() {
 		return "Takeoff";
 	}
 	
 	ORM_FIELD_METADATA(Takeoff, TAKEOFF_FIELDS)
 	ORM_FIELD_ACCESSOR(Takeoff, TAKEOFF_FIELDS)
 };
+

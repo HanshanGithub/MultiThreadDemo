@@ -1,10 +1,10 @@
 #pragma once
 #include <QString>
 
-//! 传递给线程的输入结构体
-typedef struct  
+//! 浼犻�掔粰绾跨▼鐨勮緭鍏ョ粨鏋勪綋
+typedef struct
 {
 	QString msg;
 	int threadMaxCount;
 	int calculateCount;
-}CalculateInputStruct; 
+}CalculateInputStruct;

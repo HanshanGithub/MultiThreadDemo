@@ -9,7 +9,7 @@ namespace ThreadDemo
 	{
 		if (aVectorSize <= 0)
 			m_VectorSize = 1;
-		else 
+		else
 			m_VectorSize = aVectorSize;
 	}
 
@@ -21,14 +21,14 @@ namespace ThreadDemo
 
 	void CalculateRunnable::run()
 	{
-		// ÔÚ¹¤×÷Ïß³ÌÖÐÖ´ÐÐ¼ÆËãÈÎÎñ
+		// åœ¨å·¥ä½œçº¿ç¨‹ä¸­æ‰§è¡Œè®¡ç®—ä»»åŠ¡
 		m_Result.height = 300.0;
 		m_Result.weight = 20000.0;
 		m_Result.windSpeed = 10.0;
 		m_Result.temperature = 0.0;
 		m_Result.runwayLength = 3000.0;
 
-		// Éú³ÉÁÐ±íÊý¾Ý£¨10¸öÊ±¼äµã£¬0-9Ãë£©
+		// ç”Ÿæˆåˆ—è¡¨æ•°æ®ï¼ˆ10ä¸ªæ—¶é—´ç‚¹ï¼Œ0-9ç§’ï¼‰
 		m_Result.slipTimeList = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		m_Result.liftOffHeightList = { 0, 0, 0, 0, 0, 1, 2, 3, 5, 8 };
 		m_Result.slipDistanceList = { 0, 12, 31, 46, 76, 99, 145, 234, 436, 674 };
