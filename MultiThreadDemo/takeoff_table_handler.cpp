@@ -44,6 +44,71 @@ bool TakeoffTableHandler::insert(const Takeoff& record) {
 	return success;
 }
 
+bool TakeoffTableHandler::insertBatch(const std::vector<Takeoff>& records) {
+	if (!m_db || records.empty()) return false;
+
+	// 开始事务
+	int rc = sqlite3_exec(m_db, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
+	if (rc != SQLITE_OK) {
+		DB_LOG_ERROR("Failed to begin transaction: " + std::string(sqlite3_errmsg(m_db)));
+		return false;
+	}
+
+	// 只准备一次 SQL 语句（关键优化点）
+	std::string insertSql = SQLGenerator::generateInsertSQL(
+		Takeoff::getTableName(),
+		Takeoff::getFieldMetadata()
+	);
+
+	sqlite3_stmt* stmt = nullptr;
+	rc = sqlite3_prepare_v2(m_db, insertSql.c_str(), -1, &stmt, nullptr);
+	if (rc != SQLITE_OK) {
+		DB_LOG_ERROR("Failed to prepare insert statement: " + std::string(sqlite3_errmsg(m_db)));
+		sqlite3_exec(m_db, "ROLLBACK", nullptr, nullptr, nullptr);
+		return false;
+	}
+
+	FieldMetadataList fields = SQLGenerator::getInsertFields(Takeoff::getFieldMetadata());
+	bool success = true;
+
+	// 循环插入，复用同一个 statement（性能关键优化）
+	for (const auto& record : records) {
+		// 重置语句（比重新准备快得多）
+		sqlite3_reset(stmt);
+		sqlite3_clear_bindings(stmt);
+
+		// 绑定参数
+		int index = 1;
+		for (const auto& field : fields) {
+			Takeoff::FieldAccessor::bindField(stmt, index++, record, field.name);
+		}
+
+		// 执行
+		rc = sqlite3_step(stmt);
+		if (rc != SQLITE_DONE) {
+			DB_LOG_ERROR("Failed to insert takeoff record: " + std::string(sqlite3_errmsg(m_db)));
+			success = false;
+			break;
+		}
+	}
+
+	// 释放语句（只释放一次）
+	sqlite3_finalize(stmt);
+
+	// 提交或回滚事务
+	if (success) {
+		rc = sqlite3_exec(m_db, "COMMIT", nullptr, nullptr, nullptr);
+		if (rc != SQLITE_OK) {
+			DB_LOG_ERROR("Failed to commit transaction: " + std::string(sqlite3_errmsg(m_db)));
+			success = false;
+		}
+	} else {
+		sqlite3_exec(m_db, "ROLLBACK", nullptr, nullptr, nullptr);
+	}
+
+	return success;
+}
+
 std::vector<Takeoff> TakeoffTableHandler::getAll() {
 	std::vector<Takeoff> records;
 	if (!m_db) return records;

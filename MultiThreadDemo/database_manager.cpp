@@ -58,6 +58,18 @@ bool DatabaseManager::open(const std::string& dbPath, const std::string& key) {
 	}
 	sqlite3_finalize(stmt);
 
+	// 优化 SQLite 性能设置（提升批量写入速度）
+	// 注意：这些设置会降低安全性，但能显著提升写入性能
+	// synchronous = OFF: 禁用同步，写入更快但断电可能丢失数据
+	// journal_mode = MEMORY: 日志存储在内存中，减少磁盘 I/O
+	// cache_size = -64000: 设置缓存大小为 64MB（负值表示 KB）
+	// temp_store = MEMORY: 临时表存储在内存中
+	sqlite3_exec(m_db, "PRAGMA synchronous = OFF", nullptr, nullptr, nullptr);
+	sqlite3_exec(m_db, "PRAGMA journal_mode = MEMORY", nullptr, nullptr, nullptr);
+	sqlite3_exec(m_db, "PRAGMA cache_size = -64000", nullptr, nullptr, nullptr);
+	sqlite3_exec(m_db, "PRAGMA temp_store = MEMORY", nullptr, nullptr, nullptr);
+	sqlite3_exec(m_db, "PRAGMA mmap_size = 268435456", nullptr, nullptr, nullptr); // 256MB 内存映射
+
 	m_isOpen = true;
 	initTableHandlers();
 	std::cout << "[DEBUG] Database opened successfully: " << dbPath << std::endl;

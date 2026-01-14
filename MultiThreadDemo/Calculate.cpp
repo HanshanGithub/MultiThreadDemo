@@ -35,7 +35,7 @@ namespace ThreadDemo
 
 	void Calculate::startCalculate(const CalculateInputStruct aInput)
 	{
-		QString dbPath = QDir::current().absoluteFilePath("wlx-sql-cpp.db");
+		QString dbPath = QDir::current().absoluteFilePath("wlx-sqlcipher.db");
 
 		// 1. 创建数据库管理器（ORM 封装）
 		DatabaseManager dbManager;

@@ -25,6 +25,7 @@ public:
 	}
 
 	bool insert(const Takeoff& record) override;
+	bool insertBatch(const std::vector<Takeoff>& records) override;
 	std::vector<Takeoff> getAll() override;
 	Takeoff getById(int id) override;
 	bool update(const Takeoff& record) override;
