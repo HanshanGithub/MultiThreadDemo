@@ -17,6 +17,7 @@
 	X(double, windSpeed, "REAL", "(0)", true) \
 	X(double, temperature, "REAL", "(15)", true) \
 	X(double, runwaySlope, "REAL", "(0)", true) \
+	X(std_string, config, "TEXT", "''", true) \
 	LIST(std::vector<double>, timeList, "TEXT", "", false) \
 	LIST(std::vector<double>, groundSpeedList, "TEXT", "", false) \
 	LIST(std::vector<double>, machList, "TEXT", "", false) \
@@ -30,8 +31,7 @@
 	LIST(std::vector<double>, aerodynamicDragList, "TEXT", "", false) \
 	X(double, runDistance, "REAL", "(0)", true) \
 	X(double, runTime, "REAL", "(0)", true) \
-	X(double, obstacleCrossingDistance, "REAL", "(0)", true) \
-	X(std_string, config, "TEXT", "''", true)
+	X(double, obstacleCrossingDistance, "REAL", "(0)", true)
 
 // =====================================================
 // 结构体定义

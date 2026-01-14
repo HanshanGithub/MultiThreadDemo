@@ -1,7 +1,9 @@
 #pragma once
 #include <QRunnable>
 #include <QObject>
+
 #include "takeoff.h"
+#include "climb.h"
 
 namespace ThreadDemo
 {
@@ -17,7 +19,8 @@ namespace ThreadDemo
 		~CalculateRunnable();
 
 		// 获取计算结果
-		Takeoff getResult() const { return m_Result; }
+		Takeoff getTakeResult() const { return m_TakeResult; }
+		Climb getClimbResult() const { return m_ClimbResult; }
 
 	signals:
 		void runnableFinishedSignal();
@@ -27,7 +30,8 @@ namespace ThreadDemo
 
 	private:
 		int m_VectorSize;
-		Takeoff m_Result;
+		Takeoff m_TakeResult;
+		Climb m_ClimbResult;
 	};
 
 }

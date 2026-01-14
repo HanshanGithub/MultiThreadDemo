@@ -30,6 +30,9 @@
     <Filter Include="thread">
       <UniqueIdentifier>{2a3dce20-08ef-431b-8ac7-19d1a3124c42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="climb">
+      <UniqueIdentifier>{48b17ef8-d341-4b90-a657-f4182f2ea0f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="MultiThreadDemo.qrc">
@@ -60,6 +63,9 @@
     </ClCompile>
     <ClCompile Include="Calculate.cpp">
       <Filter>thread</Filter>
+    </ClCompile>
+    <ClCompile Include="climb_table_handler.cpp">
+      <Filter>climb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +103,12 @@
     </ClInclude>
     <ClInclude Include="sql_generator.h">
       <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="climb_table_handler.h">
+      <Filter>climb</Filter>
+    </ClInclude>
+    <ClInclude Include="climb.h">
+      <Filter>climb</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

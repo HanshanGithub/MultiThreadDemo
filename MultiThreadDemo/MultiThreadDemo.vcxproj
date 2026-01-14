@@ -113,6 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="climb_table_handler.cpp" />
     <ClCompile Include="takeoff_table_handler.cpp" />
     <QtRcc Include="MultiThreadDemo.qrc" />
     <QtUic Include="MultiThreadDemo.ui" />
@@ -128,6 +129,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CalculateInputStruct.h" />
+    <ClInclude Include="climb.h" />
+    <ClInclude Include="climb_table_handler.h" />
     <ClInclude Include="database_manager.h" />
     <ClInclude Include="field_metadata.h" />
     <ClInclude Include="orm_macros.h" />

@@ -39,13 +39,13 @@ bool DatabaseManager::open(const std::string& dbPath, const std::string& key) {
 	}
 
 	// 设置 SQLCipher 密钥
-	rc = sqlite3_key(m_db, key.c_str(), static_cast<int>(key.size()));
-	if (rc != SQLITE_OK) {
-		std::cerr << "[ERROR] Failed to set SQLCipher key: " << sqlite3_errmsg(m_db) << std::endl;
-		sqlite3_close(m_db);
-		m_db = nullptr;
-		return false;
-	}
+// 	rc = sqlite3_key(m_db, key.c_str(), static_cast<int>(key.size()));
+// 	if (rc != SQLITE_OK) {
+// 		std::cerr << "[ERROR] Failed to set SQLCipher key: " << sqlite3_errmsg(m_db) << std::endl;
+// 		sqlite3_close(m_db);
+// 		m_db = nullptr;
+// 		return false;
+// 	}
 
 	// 验证密钥是否正确
 	sqlite3_stmt* stmt = nullptr;

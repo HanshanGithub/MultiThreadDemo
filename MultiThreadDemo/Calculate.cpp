@@ -11,6 +11,8 @@
 #include "database_manager.h"
 #include "takeoff.h"
 #include "takeoff_table_handler.h"
+#include "climb.h"
+#include "climb_table_handler.h"
 #include <QDateTime>
 
 namespace ThreadDemo
@@ -35,7 +37,7 @@ namespace ThreadDemo
 
 	void Calculate::startCalculate(const CalculateInputStruct aInput)
 	{
-		QString dbPath = QDir::current().absoluteFilePath("wlx-sqlcipher.db");
+		QString dbPath = QDir::current().absoluteFilePath("wlx-sqlite.db");
 
 		// 1. 创建数据库管理器（ORM 封装）
 		DatabaseManager dbManager;
@@ -51,6 +53,7 @@ namespace ThreadDemo
 			dbManager.close();
 		}
 		TakeoffTableHandler* takeoffHandler = dbManager.getHandler<TakeoffTableHandler>();
+		ClimbTableHandler* climbHandler = dbManager.getHandler<ClimbTableHandler>();
 
 		// 		// 4. 创建数据对象（ORM 实体）- 基于实际数据示例
 		// 		std::vector<Takeoff> records;
@@ -59,7 +62,9 @@ namespace ThreadDemo
 
 		// 4. 创建数据对象容器，用于收集多线程计算结果
 		std::vector<Takeoff> records;
+		std::vector<Climb> climbRecords;
 		QMutex recordsMutex; // 保护 records 的互斥锁
+		QMutex climbRecordsMutex; // 保护 climbRecords 的互斥锁
 
 		m_ThreadPool = new QThreadPool();
 		m_ThreadPool->setMaxThreadCount(aInput.threadMaxCount); // 设置线程池的最大线程数
@@ -75,12 +80,16 @@ namespace ThreadDemo
 			runnables.push_back(runnable);
 
 			// 信号用于更新进度条
-			connect(runnable, &CalculateRunnable::runnableFinishedSignal, this, [this, runnable, &records, &recordsMutex]() {
+			connect(runnable, &CalculateRunnable::runnableFinishedSignal, this, [this, runnable, &records, &recordsMutex, &climbRecords, &climbRecordsMutex]() {
 				emit updateProssorbarSignal();
 
 				// 收集计算结果到 records（线程安全）
 				QMutexLocker locker(&recordsMutex);
-				records.push_back(runnable->getResult());
+				records.push_back(runnable->getTakeResult());
+				
+				// 收集爬升计算结果到 climbRecords（线程安全）
+				QMutexLocker climbLocker(&climbRecordsMutex);
+				climbRecords.push_back(runnable->getClimbResult());
 				},
 				Qt::DirectConnection
 			);
@@ -92,6 +101,11 @@ namespace ThreadDemo
 		// 5. 批量插入（使用 TableHandler）- 一次性插入所有结果
 		if (!takeoffHandler || !takeoffHandler->insertBatch(records)) {
 			qCritical() << "Failed to insert takeoff records";
+		}
+
+		// 6. 批量插入爬升数据（使用 TableHandler）- 一次性插入所有结果
+		if (!climbHandler || !climbHandler->insertBatch(climbRecords)) {
+			qCritical() << "Failed to insert climb records";
 		}
 
 		// 手动删除所有 runnable
