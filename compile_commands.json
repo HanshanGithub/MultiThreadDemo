@@ -1,0 +1,37 @@
+[
+    {
+        "directory": "E:/_Files/MultiThreadDemo/MultiThreadDemo",
+        "command": "g++ -std=c++17 -IE:/_Files/MultiThreadDemo/sqlcipher-4.5.5/include -IE:/_Files/MultiThreadDemo/MultiThreadDemo -DSQLITE_HAS_CODEC -c climb_table_handler.cpp",
+        "file": "E:/_Files/MultiThreadDemo/MultiThreadDemo/climb_table_handler.cpp"
+    },
+    {
+        "directory": "E:/_Files/MultiThreadDemo/MultiThreadDemo",
+        "command": "g++ -std=c++17 -IE:/_Files/MultiThreadDemo/sqlcipher-4.5.5/include -IE:/_Files/MultiThreadDemo/MultiThreadDemo -DSQLITE_HAS_CODEC -c takeoff_table_handler.cpp",
+        "file": "E:/_Files/MultiThreadDemo/MultiThreadDemo/takeoff_table_handler.cpp"
+    },
+    {
+        "directory": "E:/_Files/MultiThreadDemo/MultiThreadDemo",
+        "command": "g++ -std=c++17 -IE:/_Files/MultiThreadDemo/sqlcipher-4.5.5/include -IE:/_Files/MultiThreadDemo/MultiThreadDemo -DSQLITE_HAS_CODEC -c Calculate.cpp",
+        "file": "E:/_Files/MultiThreadDemo/MultiThreadDemo/Calculate.cpp"
+    },
+    {
+        "directory": "E:/_Files/MultiThreadDemo/MultiThreadDemo",
+        "command": "g++ -std=c++17 -IE:/_Files/MultiThreadDemo/sqlcipher-4.5.5/include -IE:/_Files/MultiThreadDemo/MultiThreadDemo -DSQLITE_HAS_CODEC -c CalculateRunnable.cpp",
+        "file": "E:/_Files/MultiThreadDemo/MultiThreadDemo/CalculateRunnable.cpp"
+    },
+    {
+        "directory": "E:/_Files/MultiThreadDemo/MultiThreadDemo",
+        "command": "g++ -std=c++17 -IE:/_Files/MultiThreadDemo/sqlcipher-4.5.5/include -IE:/_Files/MultiThreadDemo/MultiThreadDemo -DSQLITE_HAS_CODEC -c database_manager.cpp",
+        "file": "E:/_Files/MultiThreadDemo/MultiThreadDemo/database_manager.cpp"
+    },
+    {
+        "directory": "E:/_Files/MultiThreadDemo/MultiThreadDemo",
+        "command": "g++ -std=c++17 -IE:/_Files/MultiThreadDemo/sqlcipher-4.5.5/include -IE:/_Files/MultiThreadDemo/MultiThreadDemo -DSQLITE_HAS_CODEC -c MultiThreadDemo.cpp",
+        "file": "E:/_Files/MultiThreadDemo/MultiThreadDemo/MultiThreadDemo.cpp"
+    },
+    {
+        "directory": "E:/_Files/MultiThreadDemo/MultiThreadDemo",
+        "command": "g++ -std=c++17 -IE:/_Files/MultiThreadDemo/sqlcipher-4.5.5/include -IE:/_Files/MultiThreadDemo/MultiThreadDemo -DSQLITE_HAS_CODEC -c main.cpp",
+        "file": "E:/_Files/MultiThreadDemo/MultiThreadDemo/main.cpp"
+    }
+]

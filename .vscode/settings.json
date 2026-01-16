@@ -1,0 +1,63 @@
+{
+    // C/C++ 扩展设置
+    // 注意：如果使用 gcc，请将 intelliSenseMode 设置为 "windows-gcc-x64"
+    // 如果使用 MSVC，设置为 "windows-msvc-x64"
+    "C_Cpp.default.intelliSenseMode": "windows-gcc-x64",
+    // 请根据你的实际 gcc 安装路径修改下面的路径
+    // "C_Cpp.default.compilerPath": "C:/mingw64/bin/g++.exe",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/sqlcipher-4.5.5/include",
+        "${workspaceFolder}/MultiThreadDemo"
+    ],
+    "C_Cpp.default.defines": [
+        "SQLITE_HAS_CODEC"
+    ],
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.cStandard": "c17",
+    
+    // 如果使用 clangd，可以禁用 C/C++ 扩展的 IntelliSense
+    // "C_Cpp.intelliSenseEngine": "Disabled",
+    
+    // 索引和跳转设置
+    "C_Cpp.intelliSenseEngine": "Default",
+    "C_Cpp.autocomplete": "default",
+    "C_Cpp.suggestSnippets": true,
+    "C_Cpp.enhancedColorization": "enabled",
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.intelliSenseUpdateDelay": 2000,
+    
+    // 浏览路径（用于符号搜索和跳转）- 关键配置
+    "C_Cpp.default.browse": {
+        "path": [
+            "${workspaceFolder}",
+            "${workspaceFolder}/MultiThreadDemo",
+            "${workspaceFolder}/sqlcipher-4.5.5/include"
+        ],
+        "limitSymbolsToIncludedHeaders": false,
+        "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db"
+    },
+    
+    // 确保使用 compile_commands.json
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/compile_commands.json",
+    
+    // 强制重新索引的设置（Cursor 可能需要）
+    "C_Cpp.workspaceParsingPriority": "highest",
+    "C_Cpp.files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/x64": true,
+        "**/Debug": true,
+        "**/Release": true
+    },
+    
+    // Code Runner 设置（如果使用 gcc）
+    "code-runner.executorMap": {
+        "cpp": "cd $dir && g++ -std=c++17 -I\"$workspaceFolder/sqlcipher-4.5.5/include\" -DSQLITE_HAS_CODEC $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
+    },
+    "code-runner.runInTerminal": true,
+    "code-runner.clearPreviousOutput": true
+}

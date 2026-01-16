@@ -66,10 +66,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalLibraryDirectories>$(QTDIR)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(solutiondir)sqlcipher-4.5.5\lib\$(configuration)\sqlite3.lib;C:\Program Files\OpenSSL-Win64\lib\libcrypto.lib;C:\Program Files\OpenSSL-Win64\lib\libssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>E:\_Files\sqlcipher-4.5.5\lib\debug\sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(solutiondir)sqlcipher-4.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\_Files\sqlcipher-4.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SQLITE_HAS_CODEC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>

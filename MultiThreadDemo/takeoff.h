@@ -14,8 +14,8 @@
 #define TAKEOFF_FIELDS(X, LIST) \
 	X(double, height, "REAL", "(1000)", true) \
 	X(double, weight, "REAL", "(4500)", true) \
-	X(double, windSpeed, "REAL", "(0)", true) \
 	X(double, temperature, "REAL", "(15)", true) \
+	X(double, windSpeed, "REAL", "(0)", true) \
 	X(double, runwaySlope, "REAL", "(0)", true) \
 	X(std_string, config, "TEXT", "''", true) \
 	LIST(std::vector<double>, timeList, "TEXT", "", false) \
@@ -31,7 +31,10 @@
 	LIST(std::vector<double>, aerodynamicDragList, "TEXT", "", false) \
 	X(double, runDistance, "REAL", "(0)", true) \
 	X(double, runTime, "REAL", "(0)", true) \
-	X(double, obstacleCrossingDistance, "REAL", "(0)", true)
+	X(double, obstacleCrossingDistance, "REAL", "(0)", true) \
+	LIST(std::vector<double>, pullRodSpeedList, "TEXT", "", false) \
+	LIST(std::vector<double>, takeoffSpeedList, "TEXT", "", false)
+
 
 // =====================================================
 // 结构体定义

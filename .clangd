@@ -1,0 +1,18 @@
+CompileFlags:
+  Add:
+    - -I${workspaceFolder}/sqlcipher-4.5.5/include
+    - -I${workspaceFolder}/MultiThreadDemo
+    - -DSQLITE_HAS_CODEC
+    - -std=c++17
+  Remove:
+    - -W*
+
+Diagnostics:
+  UnusedIncludes: None
+  MissingIncludes: None
+
+Index:
+  Background: Build
+
+Completion:
+  AllScopes: true
