@@ -1,4 +1,0 @@
-C:\Program Files\OpenSSL-Win64\lib\libcrypto.lib
-C:\Program Files\OpenSSL-Win64\lib\libssl.lib
-
-
